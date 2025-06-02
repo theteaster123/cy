@@ -1,0 +1,121 @@
+
+-- 💖 Ultimate Love Simulator GUI (Black & Blue Theme) 💖
+-- Made for Roblox, drag-able, animated, fate-altering GUI
+
+--// Main Setup
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "makemehappyGUI"
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 500, 0, 620)
+mainFrame.Position = UDim2.new(0.5, -250, 0.5, -310)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10) -- Black background
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Name = "MainFrame"
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner", mainFrame)
+uiCorner.CornerRadius = UDim.new(0, 20)
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.Text = "can you make me happy?"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(0, 120, 255) -- Blue text
+
+local loveBar = Instance.new("TextLabel", mainFrame)
+loveBar.Size = UDim2.new(1, -20, 0, 30)
+loveBar.Position = UDim2.new(0, 10, 0, 50)
+loveBar.Text = "friends if more maybe more than friends: 0"
+loveBar.Font = Enum.Font.GothamMedium
+loveBar.TextSize = 18
+loveBar.BackgroundTransparency = 1
+loveBar.TextColor3 = Color3.fromRGB(0, 100, 255) -- Light blue
+
+--// Core Variables
+local love = 0
+local heartbreak = false
+local loveGoal = 40
+local memoryList = {}
+
+--// Choices
+local choices = {
+{text = "Write a poem", value = 12},
+{text = "Forget my birthday", value = -20},
+{text = "Bring me my favorite snack", value = 10},
+{text = "Talk about your ex", value = -18},
+{text = "talk for hours", value = 15},
+{text = "dont talk to me", value = -10},
+{text = "Buy me a gift", value = 8},
+{text = "Ignore my feelings", value = -25},
+{text = "show me funny vid", value = 14},
+{text = "Laugh at my stuff", value = -15},
+}
+
+--// Shuffle Function
+local function shuffle(tbl)
+    for i = #tbl, 2, -1 do
+        local j = math.random(i)
+        tbl[i], tbl[j] = tbl[j], tbl[i]
+    end
+end
+shuffle(choices)
+
+--// Memory display
+local memLabel = Instance.new("TextLabel", mainFrame)
+memLabel.Size = UDim2.new(1, -20, 0, 25)
+memLabel.Position = UDim2.new(0, 10, 0, 90 + #choices * 40)
+memLabel.Font = Enum.Font.Gotham
+memLabel.TextSize = 14
+memLabel.TextColor3 = Color3.fromRGB(0, 170, 255) -- Bright blue
+memLabel.Text = "❤️ Memories: 0"
+memLabel.BackgroundTransparency = 1
+
+--// Button Generator
+for i, choice in ipairs(choices) do
+    local btn = Instance.new("TextButton")
+    btn.Text = choice.text
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, 0, 90 + (i - 1) * 40)
+    btn.Parent = mainFrame
+    btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Dark button background
+    btn.TextColor3 = Color3.fromRGB(0, 150, 255) -- Blue text
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.BorderSizePixel = 0
+    btn.Name = "ChoiceBtn" .. i
+
+    local corner = Instance.new("UICorner", btn)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    btn.MouseButton1Click:Connect(function()
+        love += choice.value
+        table.insert(memoryList, choice.text)
+        loveBar.Text = "friends if more maybe more than friends: " .. love
+        memLabel.Text = "Memories: " .. #memoryList
+
+        if love <= -5 then
+            heartbreak = true
+            title.Text = "You broke my heart."
+            wait(2)
+            mainFrame:TweenSize(UDim2.new(0, 0, 0, 0), "Out", "Bounce", 1, true, function()
+                screenGui:Destroy()
+            end)
+        elseif love >= loveGoal then
+            title.Text = "You won my heart!"
+        elseif love >= 30 then
+            title.Text = "😊 I’m falling for you..."
+        else
+            title.Text = "😐 I'm not sure how I feel yet..."
+        end
+
+        btn:Destroy()
+    end)
+end
